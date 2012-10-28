@@ -21,6 +21,9 @@ include_once 'tsitaatcom_migrate_utils.inc';
  * and it's good not to import it to check later who has logged into new system.
  */
 class TsitaatComUserMigration extends Migration {
+  /**
+   * Implements __construct().
+   */
   public function __construct() {
 
     parent::__construct();
@@ -29,12 +32,14 @@ class TsitaatComUserMigration extends Migration {
 
     $query = $connection->select('phpbb_users', 'users');
 
-    $query->fields('users', array(
+    $query->fields(
+      'users',
+      array(
         'user_id',
         'username_clean',
         'user_email',
         'user_regdate',
-        'user_lastactivity'
+        'user_lastactivity',
       )
     )
     ->condition(db_or()
@@ -46,12 +51,14 @@ class TsitaatComUserMigration extends Migration {
 
     $this->destination = new MigrateDestinationUser();
 
-    $this->map = new MigrateSQLMap($this->machineName,
-      array('user_id' => array(
-              'type' => 'int',
-              'unsigned' => TRUE,
-              'not null' => TRUE,
-              ),
+    $this->map = new MigrateSQLMap(
+      $this->machineName,
+      array(
+        'user_id' => array(
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ),
       ),
       MigrateDestinationUser::getKeySchema()
     );
@@ -82,8 +89,11 @@ class TsitaatComQuotesMigration extends Migration {
   public function __construct() {
 
     $this->dependencies = array('TsitaatComUser');
-    // TODO: should be uncommented, needed for test with 10 authors only
-    // $this->dependencies = array('TsitaatComAuthors');
+
+    /*
+      TODO: should be uncommented, needed for test with 10 authors only
+      $this->dependencies = array('TsitaatComAuthors');
+    */
 
     parent::__construct();
 
@@ -116,7 +126,7 @@ class TsitaatComQuotesMigration extends Migration {
           'created_by',
           'created_time',
           'revision',
-          'active'
+          'active',
         )
       )
       ->orderBy('a_tsitaatcom2_quotes.id', 'DESC');
