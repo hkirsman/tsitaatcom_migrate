@@ -8,10 +8,11 @@
 /*
  * @TODO: check timezone stuff for drupal and this import
  * @TODO: add est timezone for users
- * @TODO: http://drupal.tsitaat.com/content/raoul-wallenberg-0 /// MIKS NULL L6PUS
+ * @TODO: MIKS NULL LÕPUS
+ * http://drupal.tsitaat.com/content/raoul-wallenberg-0
  */
 
-include_once('tsitaatcom_migrate_utils.inc');
+include_once 'tsitaatcom_migrate_utils.inc';
 
 /*
  * Migrate tsitaat.com users.
@@ -28,10 +29,17 @@ class TsitaatComUserMigration extends Migration {
 
     $query = $connection->select('phpbb_users', 'users');
 
-    $query->fields('users', array('user_id', 'username_clean', 'user_email', 'user_regdate', 'user_lastactivity'))
-          ->condition(db_or()
-          ->condition('user_type', 0)
-          ->condition('group_id', 5));
+    $query->fields('users', array(
+        'user_id',
+        'username_clean',
+        'user_email',
+        'user_regdate',
+        'user_lastactivity'
+      )
+    )
+    ->condition(db_or()
+    ->condition('user_type', 0)
+    ->condition('group_id', 5));
 
     $this->source = new MigrateSourceSQL($query, array(), NULL, array('map_joinable' => FALSE));
 
@@ -42,27 +50,23 @@ class TsitaatComUserMigration extends Migration {
               'type' => 'int',
               'unsigned' => TRUE,
               'not null' => TRUE,
-              )
+              ),
       ),
       MigrateDestinationUser::getKeySchema()
     );
 
     $this->addFieldMapping('uid', 'user_id');
-    $this->addFieldMapping('is_new')->defaultValue(TRUE); // to set custom uid
+    // To set custom uid.
+    $this->addFieldMapping('is_new')->defaultValue(TRUE);
     $this->addFieldMapping('name', 'username_clean');
     $this->addFieldMapping('mail', 'user_email');
     $this->addFieldMapping('created', 'user_regdate');
     $this->addUnmigratedDestinations(array('theme', 'signature', 'access', 'login',
       'timezone', 'language', 'picture', 'signature_format', 'init'));
-    //$this->addFieldMapping('access', 'user_lastactivity'); // is this correct?
-    //$this->addUnmigratedDestinations(array('status'));
-
+    // Is this correct?
+    // $this->addFieldMapping('access', 'user_lastactivity');
+    // $this->addUnmigratedDestinations(array('status'));
   }
-
-    public function prepareRow($current_row) {
-
-    }
-
 }
 
 
@@ -71,10 +75,14 @@ class TsitaatComUserMigration extends Migration {
  */
 class TsitaatComQuotesMigration extends Migration {
 
+  /**
+   * Implements __construct().
+   */
   public function __construct() {
 
     $this->dependencies = array('TsitaatComUser');
-    //$this->dependencies = array('TsitaatComAuthors'); // TODO: should be uncommented, needed for test with 10 authors only
+    // TODO: should be uncommented, needed for test with 10 authors only
+    // $this->dependencies = array('TsitaatComAuthors');
 
     parent::__construct();
 
@@ -82,7 +90,7 @@ class TsitaatComQuotesMigration extends Migration {
 
     $query = $connection->select('a_tsitaatcom2_quotes', 'a_tsitaatcom2_quotes');
 
-    // get absolutely all quotes
+    // Get absolutely all quotes.
     $query
       ->fields('a_tsitaatcom2_quotes', array(
                                               'id',
@@ -116,15 +124,17 @@ class TsitaatComQuotesMigration extends Migration {
 
     $this->map = new MigrateSQLMap($this->machineName,
       array(
-        'id' => array('type' => 'int',
-                      'unsigned' => TRUE,
-                      'not null' => TRUE,
-                      )
+        'id' => array(
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
         ),
-        MigrateDestinationNode::getKeySchema()
-      );
+      ),
+      MigrateDestinationNode::getKeySchema()
+    );
 
-    $this->addFieldMapping('title', 'id'); // temp, will set in prepareRow()
+    // Temporary, will set in prepareRow().
+    $this->addFieldMapping('title', 'id');
     $this->addFieldMapping('nid', 'id');
     $this->addFieldMapping('is_new')->defaultValue(TRUE);
     $this->addFieldMapping('uid')->defaultValue(1);
@@ -150,16 +160,11 @@ class TsitaatComQuotesMigration extends Migration {
     $this->addFieldMapping('field_created_time', 'created_time');
     $this->addFieldMapping('field_revision', 'revision');
     $this->addFieldMapping('field_active', 'active');
-
-    //his->addFieldMapping('author_id_new')->defaultValue(1);
-    //his->addFieldMapping('field_created_by_new')->defaultValue(1);
-
   }
 
-  public function prepareRow($current_row) {
-
-  }
-
+  /**
+   * Implements complete().
+   */
   public function complete($node, $row) {
     $result = db_query('SELECT nid
       FROM
@@ -174,11 +179,11 @@ class TsitaatComQuotesMigration extends Migration {
       ',
       array(
         ':type' => 'quote_author',
-        ':field_id_value' => $node->field_author_id['und'][0]['value']
+        ':field_id_value' => $node->field_author_id['und'][0]['value'],
       )
     );
 
-    foreach( $result as $item ) {
+    foreach ($result as $item) {
       $author_nid = $item->nid;
     }
 
@@ -193,6 +198,9 @@ class TsitaatComQuotesMigration extends Migration {
  */
 class TsitaatComAuthorsMigration extends Migration {
 
+  /**
+   * Implements __construct().
+   */
   public function __construct() {
 
     parent::__construct();
@@ -244,16 +252,17 @@ class TsitaatComAuthorsMigration extends Migration {
 
     $this->map = new MigrateSQLMap($this->machineName,
       array(
-        'id' => array('type' => 'int',
-                      'unsigned' => TRUE,
-                      'not null' => TRUE,
-                      )
+        'id' => array(
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
         ),
-        MigrateDestinationNode::getKeySchema()
-      );
+      ),
+      MigrateDestinationNode::getKeySchema()
+    );
 
-
-    $this->addFieldMapping('title', 'title'); // temp, will set in prepareRow()
+    // Temporary - will set in prepareRow().
+    $this->addFieldMapping('title', 'title');
     $this->addFieldMapping('nid', 'id');
     $this->addFieldMapping('is_new')->defaultValue(TRUE);
     $this->addFieldMapping('uid')->defaultValue(1);
@@ -291,6 +300,9 @@ class TsitaatComAuthorsMigration extends Migration {
     $this->addFieldMapping('field_active', 'active');
   }
 
+  /**
+   * Implements prepareRow().
+   */
   public function prepareRow($current_row) {
     $author_title = _tsitaatcom_migrate_quote_author_title($current_row->author_name_freeform_et,
                                                              $current_row->author_firstname_et,
@@ -299,11 +311,16 @@ class TsitaatComAuthorsMigration extends Migration {
     $current_row->title = $author_title;
     $current_row->temp_id = $current_row->id;
     $current_row->id = _tsitaatcom_migrate_get_new_node_id();
-    foreach($current_row as $key=>$var) {
-      //$current_row->$key = trim($var);
+    foreach ($current_row as $key => $var) {
+      // $current_row->$key = trim($var);
     }
   }
 
+  /**
+   * Implements complete().
+   *
+   * Change status and id.
+   */
   public function complete($node, $row) {
     if ($row->active == 0) {
       $node->status = 0;

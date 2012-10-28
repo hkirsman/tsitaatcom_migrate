@@ -6,8 +6,8 @@
  */
 
  /**
- * Create nice author name.
- */
+  * Create nice author name.
+  */
 function _tsitaatcom_migrate_quote_author_title($author_name_freeform, $author_firstname, $author_midname, $author_lastname) {
 
   if (strlen(trim($author_name_freeform))) {
@@ -25,13 +25,15 @@ function _tsitaatcom_migrate_quote_author_title($author_name_freeform, $author_f
  * Finds biggest node id and increments 1.
  */
 function _tsitaatcom_migrate_get_new_node_id() {
-  $result = db_query('SELECT nid
-  FROM
-    {node} n
-  ORDER BY nid DESC LIMIT 1');
+  $result = db_query('
+    SELECT nid
+    FROM
+      {node} n
+    ORDER BY nid DESC LIMIT 1'
+  );
 
   foreach ($result as $index) {
-    $nid = $index->nid+1;
+    $nid = $index->nid + 1;
   }
 
   if (!isset($nid)) {
@@ -40,12 +42,12 @@ function _tsitaatcom_migrate_get_new_node_id() {
     $query
       ->fields('a_tsitaatcom2_quotes', array('id'))
       ->orderBy('a_tsitaatcom2_quotes.id', 'DESC')
-      ->range(0,1);
+      ->range(0, 1);
 
     $result = $query->execute();
 
     foreach ($result as $index) {
-      $nid = $index->id+1;
+      $nid = $index->id + 1;
     }
   }
 
