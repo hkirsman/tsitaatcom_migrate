@@ -10,7 +10,7 @@
   */
 function _tsitaatcom_migrate_quote_author_title($author_name_freeform, $author_firstname, $author_midname, $author_lastname) {
 
-  if (strlen(trim($author_name_freeform))) {
+  if (drupal_strlen(trim($author_name_freeform))) {
     return trim($author_name_freeform);
   }
   else {
