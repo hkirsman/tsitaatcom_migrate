@@ -93,7 +93,8 @@ class TsitaatComQuotesMigration extends Migration {
 
     // Get absolutely all quotes.
     $query
-      ->fields('a_tsitaatcom2_quotes',
+      ->fields(
+        'a_tsitaatcom2_quotes',
         array(
           'id',
           'q_id',
@@ -214,39 +215,42 @@ class TsitaatComAuthorsMigration extends Migration {
 
     // Get absolutely all quotes.
     $query
-      ->fields('authors', array(
-                                  'id',
-                                  'author_name_freeform_et',
-                                  'author_name_freeform_en',
-                                  'author_name_freeform_de',
-                                  'author_name_amazon',
-                                  'author_firstname_et',
-                                  'author_firstname_en',
-                                  'author_firstname_de',
-                                  'author_midname_et',
-                                  'author_midname_en',
-                                  'author_midname_de',
-                                  'author_lastname_et',
-                                  'author_lastname_en',
-                                  'author_lastname_de',
-                                  'author_born_death_circa',
-                                  'author_born',
-                                  'author_born_circa',
-                                  'author_death',
-                                  'author_death_circa',
-                                  'author_profession_et',
-                                  'author_profession_en',
-                                  'author_profession_de',
-                                  'author_nationality',
-                                  'is_tsitaatcom_user',
-                                  'author_wiki_url_et',
-                                  'author_wiki_url_en',
-                                  'author_wiki_url_de',
-                                  'url_friendly_author_name_et',
-                                  'url_friendly_author_name_en',
-                                  'url_friendly_author_name_de',
-                                  'active',
-          ))
+      ->fields(
+        'authors',
+        array(
+          'id',
+          'author_name_freeform_et',
+          'author_name_freeform_en',
+          'author_name_freeform_de',
+          'author_name_amazon',
+          'author_firstname_et',
+          'author_firstname_en',
+          'author_firstname_de',
+          'author_midname_et',
+          'author_midname_en',
+          'author_midname_de',
+          'author_lastname_et',
+          'author_lastname_en',
+          'author_lastname_de',
+          'author_born_death_circa',
+          'author_born',
+          'author_born_circa',
+          'author_death',
+          'author_death_circa',
+          'author_profession_et',
+          'author_profession_en',
+          'author_profession_de',
+          'author_nationality',
+          'is_tsitaatcom_user',
+          'author_wiki_url_et',
+          'author_wiki_url_en',
+          'author_wiki_url_de',
+          'url_friendly_author_name_et',
+          'url_friendly_author_name_en',
+          'url_friendly_author_name_de',
+          'active',
+        )
+      )
       ->orderBy('authors.id', 'DESC');
 
     $this->source = new MigrateSourceSQL($query, array(), NULL, array('map_joinable' => FALSE));
