@@ -1,16 +1,24 @@
 <?php
-// @TODO: check timezone stuff for drupal and this import
-// @TODO: add est timezone for users
-// @TODO: http://drupal.tsitaat.com/content/raoul-wallenberg-0 /// MIKS NULL L6PUS
 
+/**
+ * @file
+ * Main module file for tsitaatcom_migrate.
+ */
+
+/*
+ * @TODO: check timezone stuff for drupal and this import
+ * @TODO: add est timezone for users
+ * @TODO: http://drupal.tsitaat.com/content/raoul-wallenberg-0 /// MIKS NULL L6PUS
+ */
 
 include_once('tsitaatcom_migrate_utils.inc');
 
-
 /*
-  Last login is not imported. I think there isn't such a field in phpbb
-  and it's good not to import it to check later who has logged into new system
-  */
+ * Migrate tsitaat.com users.
+ *
+ * Last login is not imported. I think there isn't such a field in phpbb
+ * and it's good not to import it to check later who has logged into new system.
+ */
 class TsitaatComUserMigration extends Migration {
   public function __construct() {
 
@@ -58,6 +66,9 @@ class TsitaatComUserMigration extends Migration {
 }
 
 
+/*
+ * Migrate tsitaat.com quotes.
+ */
 class TsitaatComQuotesMigration extends Migration {
 
   public function __construct() {
@@ -177,8 +188,9 @@ class TsitaatComQuotesMigration extends Migration {
   }
 }
 
-
-
+/*
+ * Migrate tsitaat.com quote authors.
+ */
 class TsitaatComAuthorsMigration extends Migration {
 
   public function __construct() {
@@ -189,7 +201,7 @@ class TsitaatComAuthorsMigration extends Migration {
 
     $query = $connection->select('a_tsitaatcom2_quote_authors', 'authors');
 
-    // get absolutely all quotes
+    // Get absolutely all quotes.
     $query
       ->fields('authors', array(
                                   'id',

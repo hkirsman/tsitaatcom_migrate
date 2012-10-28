@@ -1,10 +1,19 @@
 <?php
 
+/**
+ * @file
+ * Tsitaatcom migrate utility functions.
+ */
+
+ /**
+ * Create nice author name.
+ */
 function _tsitaatcom_migrate_quote_author_title($author_name_freeform, $author_firstname, $author_midname, $author_lastname) {
 
   if (strlen(trim($author_name_freeform))) {
     return trim($author_name_freeform);
-  } else {
+  }
+  else {
     $name = trim($author_firstname);
     $name = trim($name . ' ' . $author_midname);
     $name = trim($name . ' ' . $author_lastname);
@@ -13,7 +22,7 @@ function _tsitaatcom_migrate_quote_author_title($author_name_freeform, $author_f
 }
 
 /**
- * Finds biggest node id and increments 1
+ * Finds biggest node id and increments 1.
  */
 function _tsitaatcom_migrate_get_new_node_id() {
   $result = db_query('SELECT nid
@@ -46,20 +55,4 @@ function _tsitaatcom_migrate_get_new_node_id() {
 
 function _tsitaatcom_migrate_get_uid($user_name) {
   print_r($user_name);
-
-/*
-  $uid = NULL;
-
-  $query = db_select('users', 'u')
-      ->fields('u', array('uid'))
-      ->condition('name', $user_name)
-      ->execute();
-
-  foreach ($query as $user) {
-      $uid = $user->uid;
-  }
-
-  return $uid;
-  */
-
 }
