@@ -54,7 +54,9 @@ function _tsitaatcom_migrate_get_new_node_id() {
   return $nid;
 }
 
-
+/**
+ * I think this is not done :).
+ */
 function _tsitaatcom_migrate_get_uid($user_name) {
   print_r($user_name);
 }

@@ -38,8 +38,9 @@ class TsitaatComUserMigration extends Migration {
       )
     )
     ->condition(db_or()
-    ->condition('user_type', 0)
-    ->condition('group_id', 5));
+      ->condition('user_type', 0)
+      ->condition('group_id', 5)
+    );
 
     $this->source = new MigrateSourceSQL($query, array(), NULL, array('map_joinable' => FALSE));
 
@@ -92,29 +93,31 @@ class TsitaatComQuotesMigration extends Migration {
 
     // Get absolutely all quotes.
     $query
-      ->fields('a_tsitaatcom2_quotes', array(
-                                              'id',
-                                              'q_id',
-                                              'lang',
-                                              'rank',
-                                              'quote',
-                                              'category',
-                                              'zitate_de_category',
-                                              'tag',
-                                              'author_id',
-                                              'author2_id',
-                                              'source_id',
-                                              'source_title',
-                                              'source_title_extra_sufix',
-                                              'source_title_extra_prefix',
-                                              'source_year_start',
-                                              'source_year_start_circa',
-                                              'source_year_end',
-                                              'created_by',
-                                              'created_time',
-                                              'revision',
-                                              'active'
-                                            ))
+      ->fields('a_tsitaatcom2_quotes',
+        array(
+          'id',
+          'q_id',
+          'lang',
+          'rank',
+          'quote',
+          'category',
+          'zitate_de_category',
+          'tag',
+          'author_id',
+          'author2_id',
+          'source_id',
+          'source_title',
+          'source_title_extra_sufix',
+          'source_title_extra_prefix',
+          'source_year_start',
+          'source_year_start_circa',
+          'source_year_end',
+          'created_by',
+          'created_time',
+          'revision',
+          'active'
+        )
+      )
       ->orderBy('a_tsitaatcom2_quotes.id', 'DESC');
 
 
