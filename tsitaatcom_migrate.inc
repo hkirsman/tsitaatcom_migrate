@@ -158,10 +158,10 @@ class TsitaatComQuotesMigration extends Migration {
     $this->addFieldMapping('field_lang', 'lang');
     $this->addFieldMapping('field_rank', 'rank');
     $this->addFieldMapping('field_quote', 'quote');
-    $this->addFieldMapping('field_category', 'category');
+    $this->addFieldMapping('field_category_old', 'category');
     $this->addFieldMapping('field_zitate_de_category', 'zitate_de_category');
-    $this->addFieldMapping('field_tag', 'tag');
-    $this->addFieldMapping('field_author_id', 'author_id');
+    $this->addFieldMapping('field_tag_old', 'tag');
+    $this->addFieldMapping('field_author_id_old', 'author_id');
     $this->addFieldMapping('field_author2_id', 'author2_id');
     $this->addFieldMapping('field_source_id', 'source_id');
     $this->addFieldMapping('field_source_title', 'source_title');
@@ -184,8 +184,8 @@ class TsitaatComQuotesMigration extends Migration {
       FROM
         {node} n
       LEFT JOIN
-        {field_data_field_id} field_author_id ON
-        n.nid = field_author_id.entity_id
+        {field_data_field_id} field_author_id_old ON
+        n.nid = field_author_id_old.entity_id
       WHERE
         field_id_value = :field_id_value
       AND
@@ -193,7 +193,7 @@ class TsitaatComQuotesMigration extends Migration {
       ',
       array(
         ':type' => 'quote_author',
-        ':field_id_value' => $node->field_author_id['und'][0]['value'],
+        ':field_id_value' => $node->field_author_id_old['und'][0]['value'],
       )
     );
 
@@ -201,7 +201,7 @@ class TsitaatComQuotesMigration extends Migration {
       $author_nid = $item->nid;
     }
 
-    $node->field_author_id_new['und'][0]['target_id'] = $author_nid;
+    $node->field_author_id['und'][0]['target_id'] = $author_nid;
     $node->field_created_by_new['und'][0]['target_id'] = $row->created_by;
     node_save($node);
   }
@@ -283,38 +283,61 @@ class TsitaatComAuthorsMigration extends Migration {
     $this->addFieldMapping('nid', 'id');
     $this->addFieldMapping('is_new')->defaultValue(TRUE);
     $this->addFieldMapping('uid')->defaultValue(1);
+    $this->addFieldMapping('field_author_born_death_circa')->defaultValue(0);
+    $this->addFieldMapping('field_author_born_circa')->defaultValue(0);
+    $this->addFieldMapping('field_author_death_circa')->defaultValue(0);
+    $this->addFieldMapping('field_is_tsitaatcom_user')->defaultValue(0);
+    $this->addFieldMapping('field_active')->defaultValue(0);
 
     $this->addFieldMapping('field_id', 'id');
+    // New field.
+    $this->addFieldMapping('field_author_name_freeform', 'author_name_freeform_et');
     $this->addFieldMapping('field_author_name_freeform_et', 'author_name_freeform_et');
     $this->addFieldMapping('field_author_name_freeform_en', 'author_name_freeform_en');
     $this->addFieldMapping('field_author_name_freeform_de', 'author_name_freeform_de');
     $this->addFieldMapping('field_author_name_amazon', 'author_name_amazon');
+    // New field.
+    $this->addFieldMapping('field_author_firstname', 'author_firstname_et');
     $this->addFieldMapping('field_author_firstname_et', 'author_firstname_et');
     $this->addFieldMapping('field_author_firstname_en', 'author_firstname_en');
     $this->addFieldMapping('field_author_firstname_de', 'author_firstname_de');
+    // New field.
+    $this->addFieldMapping('field_author_midname', 'author_midname_et');
     $this->addFieldMapping('field_author_midname_et', 'author_midname_et');
     $this->addFieldMapping('field_author_midname_en', 'author_midname_en');
     $this->addFieldMapping('field_author_midname_de', 'author_midname_de');
+    // New field.
+    $this->addFieldMapping('field_author_lastname', 'author_lastname_et');
     $this->addFieldMapping('field_author_lastname_et', 'author_lastname_et');
     $this->addFieldMapping('field_author_lastname_en', 'author_lastname_en');
     $this->addFieldMapping('field_author_lastname_de', 'author_lastname_de');
-    $this->addFieldMapping('field_author_born_death_circa', 'author_born_death_circa');
+    // $this->addFieldMapping('field_author_born_death_circa', 'author_born_death_circa')->defaultValue(0);
     $this->addFieldMapping('field_author_born', 'author_born');
-    $this->addFieldMapping('field_author_born_circa', 'author_born_circa');
+    // $this->addFieldMapping('field_author_born_circa', 'author_born_circa');
     $this->addFieldMapping('field_author_death', 'author_death');
-    $this->addFieldMapping('field_author_death_circa', 'author_death_circa');
+    // $this->addFieldMapping('field_author_death_circa', 'author_death_circa');
+    // New field.
+    $this->addFieldMapping('field_author_profession', 'author_profession_et');
     $this->addFieldMapping('field_author_profession_et', 'author_profession_et');
     $this->addFieldMapping('field_author_profession_en', 'author_profession_en');
     $this->addFieldMapping('field_author_profession_de', 'author_profession_de');
     $this->addFieldMapping('field_author_nationality', 'author_nationality');
-    $this->addFieldMapping('field_is_tsitaatcom_user', 'is_tsitaatcom_user');
+    // $this->addFieldMapping('field_is_tsitaatcom_user', 'is_tsitaatcom_user');
+    $this->addFieldMapping('field_author_wiki_url', 'author_wiki_url_et');
     $this->addFieldMapping('field_author_wiki_url_et', 'author_wiki_url_et');
     $this->addFieldMapping('field_author_wiki_url_en', 'author_wiki_url_en');
     $this->addFieldMapping('field_author_wiki_url_de', 'author_wiki_url_de');
+    $this->addFieldMapping('field_urlfriendly_author_name', 'url_friendly_author_name_et');
     $this->addFieldMapping('field_urlfriendly_author_name_et', 'url_friendly_author_name_et');
     $this->addFieldMapping('field_urlfriendly_author_name_en', 'url_friendly_author_name_en');
     $this->addFieldMapping('field_urlfriendly_author_name_de', 'url_friendly_author_name_de');
-    $this->addFieldMapping('field_active', 'active');
+    // $this->addFieldMapping('field_active', 'active');
+
+    $this->addUnmigratedDestinations(
+      array(
+        'language',
+      )
+    );
   }
 
   /**
@@ -329,6 +352,12 @@ class TsitaatComAuthorsMigration extends Migration {
     );
     $current_row->title = $author_title;
     $current_row->temp_id = $current_row->id;
+    $current_row->temp_field_author_born_death_circa = $current_row->author_born_death_circa;
+    $current_row->temp_field_author_born_circa = $current_row->author_born_circa;
+    $current_row->temp_field_author_death_circa = $current_row->author_death_circa;
+    $current_row->temp_field_is_tsitaatcom_user = $current_row->is_tsitaatcom_user;
+    $current_row->temp_field_active = $current_row->active;
+
     $current_row->id = _tsitaatcom_migrate_get_new_node_id();
     foreach ($current_row as $key => $var) {
       // $current_row->$key = trim($var);
@@ -346,6 +375,42 @@ class TsitaatComAuthorsMigration extends Migration {
     }
     $node->field_id['und'][0]['value'] = $row->temp_id;
     $node->promote = 0;
+    $node->language = 'et';
+    if ($row->temp_field_author_born_death_circa == 1) {
+      $node->field_author_born_death_circa['und'][0]['value'] = 1;
+    }
+    else {
+      $node->field_author_born_death_circa['und'][0]['value'] = 0;
+    }
+
+    if ($row->temp_field_author_born_circa == 1) {
+      $node->field_author_born_circa['und'][0]['value'] = 1;
+    }
+    else {
+      $node->field_author_born_circa['und'][0]['value'] = 0;
+    }
+
+    if ($row->temp_field_author_death_circa == 1) {
+      $node->field_author_death_circa['und'][0]['value'] = 1;
+    }
+    else {
+      $node->field_author_death_circa['und'][0]['value'] = 0;
+    }
+
+    if ($row->temp_field_is_tsitaatcom_user == 1) {
+      $node->field_is_tsitaatcom_user['und'][0]['value'] = 1;
+    }
+    else {
+      $node->field_is_tsitaatcom_user['und'][0]['value'] = 0;
+    }
+
+    if ($row->temp_field_active == 1) {
+      $node->field_active['und'][0]['value'] = 1;
+    }
+    else {
+      $node->field_active['und'][0]['value'] = 0;
+    }
+
     node_save($node);
   }
 }
