@@ -91,8 +91,8 @@ class TsitaatComQuotesMigration extends Migration {
     $this->dependencies = array('TsitaatComUser');
 
     /*
-      TODO: should be uncommented, needed for test with 10 authors only
-      $this->dependencies = array('TsitaatComAuthors');
+    TODO: should be uncommented, needed for test with 10 authors only
+    $this->dependencies = array('TsitaatComAuthors');
     */
 
     parent::__construct();
@@ -321,10 +321,12 @@ class TsitaatComAuthorsMigration extends Migration {
    * Implements prepareRow().
    */
   public function prepareRow($current_row) {
-    $author_title = _tsitaatcom_migrate_quote_author_title($current_row->author_name_freeform_et,
-                                                             $current_row->author_firstname_et,
-                                                             $current_row->author_midname_et,
-                                                             $current_row->author_lastname_et);
+    $author_title = _tsitaatcom_migrate_quote_author_title(
+      $current_row->author_name_freeform_et,
+      $current_row->author_firstname_et,
+      $current_row->author_midname_et,
+      $current_row->author_lastname_et
+    );
     $current_row->title = $author_title;
     $current_row->temp_id = $current_row->id;
     $current_row->id = _tsitaatcom_migrate_get_new_node_id();
