@@ -191,6 +191,7 @@ class TsitaatComQuotesMigration extends Migration {
           'active',
         )
       )
+      ->condition('a_tsitaatcom2_quotes.lang', 'et', '=')
       ->orderBy('a_tsitaatcom2_quotes.id', 'DESC');
 
 
