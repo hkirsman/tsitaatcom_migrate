@@ -151,12 +151,6 @@ class TsitaatComQuotesMigration extends Migration {
 
     $this->dependencies = array('TsitaatComUser', 'TsitaatComQuoteCategories');
 
-
-    /*
-    TODO: should be uncommented, needed for test with 10 authors only
-    $this->dependencies = array('TsitaatComAuthors');
-    */
-
     parent::__construct();
 
     $connection = Database::getConnection('default', 'tsitaatcom');
@@ -250,8 +244,6 @@ class TsitaatComQuotesMigration extends Migration {
   public function complete($node, $row) {
     // Set category relations.
     _tsitaatcom_set_category_relations($node, $row->category);
-    // Set author relations.
-    $node = _tsitaatcom_set_author_relations($node);
     // Create and set tags.
     $node = _tsitaatcom_create_tags_and_set_relations($node, 'quote_tag');
     // Set creation date.
@@ -270,6 +262,8 @@ class TsitaatComAuthorsMigration extends Migration {
    * Implements __construct().
    */
   public function __construct() {
+
+    $this->dependencies = array('TsitaatComQuotes');
 
     parent::__construct();
 
@@ -334,7 +328,6 @@ class TsitaatComAuthorsMigration extends Migration {
 
     // Temporary - will set in prepareRow().
     $this->addFieldMapping('title', 'title');
-    $this->addFieldMapping('nid', 'id');
     $this->addFieldMapping('is_new')->defaultValue(TRUE);
     $this->addFieldMapping('uid')->defaultValue(1);
 
@@ -406,11 +399,6 @@ class TsitaatComAuthorsMigration extends Migration {
     $current_row->temp_field_author_death_circa = $current_row->author_death_circa;
     $current_row->temp_field_is_tsitaatcom_user = $current_row->is_tsitaatcom_user;
     $current_row->temp_field_active = $current_row->active;
-
-    $current_row->id = _tsitaatcom_migrate_get_new_node_id();
-    foreach ($current_row as $key => $var) {
-      // $current_row->$key = trim($var);
-    }
   }
 
   /**
@@ -457,6 +445,9 @@ class TsitaatComAuthorsMigration extends Migration {
     else {
       $node->field_is_tsitaatcom_user['und'][0]['value'] = 0;
     }
+
+    // Set author relations for quotations.
+    _tsitaatcom_set_author_relations($node);
 
     node_save($node);
   }

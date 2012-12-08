@@ -252,61 +252,57 @@ function _tsitaatcom_create_tags_and_set_relations($node, $vocabulary_name) {
 function _tsitaatcom_set_author_relations($node) {
   // Set author1 relations.
   {
-    $result = db_query('SELECT nid
+    $result = db_query('
+      SELECT nid
       FROM
         {node} n
       LEFT JOIN
-        {field_data_field_id} field_author_id ON
-        n.nid = field_author_id.entity_id
+        {field_data_field_author_id} author_id_old ON
+        n.nid = author_id_old.entity_id
       WHERE
-        field_id_value = :field_id_value
+        field_author_id_value = :author_id_old
       AND
-        TYPE = :type
-      ',
+        type = :type
+     ',
       array(
-        ':type' => 'quote_author',
-        ':field_id_value' => $node->field_author_id['und'][0]['value'],
+        ':type' => 'quote',
+        ':author_id_old' => $node->field_id['und'][0]['value'],
       )
     );
 
     foreach ($result as $item) {
-      $author_nid = $item->nid;
+      $note_quote = node_load($item->nid);
+      $note_quote->field_author['und'][0]['target_id'] = $node->nid;
+      node_save($note_quote);
     }
-
-
-    $node->field_author['und'][0]['target_id'] = $author_nid;
   }
 
   // Set author2 relations.
   {
-    $result = db_query('SELECT nid
+    $result = db_query('
+      SELECT nid
       FROM
         {node} n
       LEFT JOIN
-        {field_data_field_id} field_author_id ON
-        n.nid = field_author_id.entity_id
+        {field_data_field_author2_id} author2_id_old ON
+        n.nid = author2_id_old.entity_id
       WHERE
-        field_id_value = :field_id_value
+        field_author2_id_value = :author2_id_old
       AND
-        TYPE = :type
-      ',
+        type = :type
+     ',
       array(
-        ':type' => 'quote_author',
-        ':field_id_value' => $node->field_author2_id['und'][0]['value'],
+        ':type' => 'quote',
+        ':author2_id_old' => $node->field_id['und'][0]['value'],
       )
     );
 
-    $author2_nid = FALSE;
     foreach ($result as $item) {
-      $author2_nid = $item->nid;
-    }
-
-    if ($author2_nid) {
-      $node->field_author['und'][1]['target_id'] = $author2_nid;
+      $note_quote = node_load($item->nid);
+      $note_quote->field_author['und'][1]['target_id'] = $node->nid;
+      node_save($note_quote);
     }
   }
-
-  return $node;
 }
 
 /**
