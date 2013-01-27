@@ -246,6 +246,8 @@ class TsitaatComQuotesMigration extends Migration {
     _tsitaatcom_set_category_relations($node, $row->category);
     // Create and set tags.
     $node = _tsitaatcom_create_tags_and_set_relations($node, 'quote_tag');
+    // Set correct uid.
+    $node->uid = $row->created_by;
     // Set creation date.
     $node->created = _tsitaatcom_mysql_datefield_to_timestamp($row->created_time);
     // Hack node_save() so it changes 'changed' field equal with created.
