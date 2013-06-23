@@ -17,3 +17,12 @@ function tsitaatcom_migrate_migrate_api() {
   );
   return $api;
 }
+
+/**
+ * Implements hook_init().
+ */
+function tsitaatcom_migrate_init() {
+  if ($_GET['q'] === 'admin/content/migrate') {
+    drupal_set_message(t('Note that author relations in quote nodes are made during TsitaatComAuthors import.'), 'status');
+  }
+}
