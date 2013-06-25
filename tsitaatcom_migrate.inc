@@ -243,15 +243,15 @@ class TsitaatComQuotesMigration extends Migration {
    */
   public function complete($node, $row) {
     // Set category relations.
-    _tsitaatcom_set_category_relations($node, $row->category);
+    _tsitaatcom_migrate_set_category_relations($node, $row->category);
     // Create and set tags.
-    $node = _tsitaatcom_create_tags_and_set_relations($node, 'quote_tag');
+    $node = _tsitaatcom_migrate_create_tags_and_set_relations($node, 'quote_tag');
     // Set correct uid.
     $node->uid = $row->created_by;
     // Set creation date.
     $node->created = _tsitaatcom_mysql_datefield_to_timestamp($row->created_time);
     // Hack node_save() so it changes 'changed' field equal with created.
-    _tsitaatcom_node_save($node);
+    _tsitaatcom_migrate_node_save($node);
   }
 }
 
@@ -412,44 +412,47 @@ class TsitaatComAuthorsMigration extends Migration {
     // Todo: could I check for if ($row->temp_field_active == 1)  also?
     if ($row->active == 0) {
       $node->status = 0;
-      $node->field_active['und'][0]['value'] = 0;
+      $node->field_active[LANGUAGE_NONE][0]['value'] = 0;
     } else {
       $node->status = 1;
-      $node->field_active['und'][0]['value'] = 1;
+      $node->field_active[LANGUAGE_NONE][0]['value'] = 1;
     }
-    $node->field_id['und'][0]['value'] = $row->temp_id;
+    $node->field_id[LANGUAGE_NONE][0]['value'] = $row->temp_id;
     $node->promote = 0;
     $node->language = 'et';
     if ($row->temp_field_author_born_death_circa == 1) {
-      $node->field_author_born_death_circa['und'][0]['value'] = 1;
+      $node->field_author_born_death_circa[LANGUAGE_NONE][0]['value'] = 1;
     }
     else {
-      $node->field_author_born_death_circa['und'][0]['value'] = 0;
+      $node->field_author_born_death_circa[LANGUAGE_NONE][0]['value'] = 0;
     }
 
     if ($row->temp_field_author_born_circa == 1) {
-      $node->field_author_born_circa['und'][0]['value'] = 1;
+      $node->field_author_born_circa[LANGUAGE_NONE][0]['value'] = 1;
     }
     else {
-      $node->field_author_born_circa['und'][0]['value'] = 0;
+      $node->field_author_born_circa[LANGUAGE_NONE][0]['value'] = 0;
     }
 
     if ($row->temp_field_author_death_circa == 1) {
-      $node->field_author_death_circa['und'][0]['value'] = 1;
+      $node->field_author_death_circa[LANGUAGE_NONE][0]['value'] = 1;
     }
     else {
-      $node->field_author_death_circa['und'][0]['value'] = 0;
+      $node->field_author_death_circa[LANGUAGE_NONE][0]['value'] = 0;
     }
 
     if ($row->temp_field_is_tsitaatcom_user == 1) {
-      $node->field_is_tsitaatcom_user['und'][0]['value'] = 1;
+      $node->field_is_tsitaatcom_user[LANGUAGE_NONE][0]['value'] = 1;
     }
     else {
-      $node->field_is_tsitaatcom_user['und'][0]['value'] = 0;
+      $node->field_is_tsitaatcom_user[LANGUAGE_NONE][0]['value'] = 0;
     }
 
     // Set author relations for quotations.
-    _tsitaatcom_set_author_relations($node);
+    _tsitaatcom_migrate_set_author_relations($node);
+
+    // Add author portrait.
+    _tsitaatcom_migrate_attach_author_portrait($node);
 
     node_save($node);
   }

@@ -5,6 +5,10 @@
  * Tsitaatcom migrate utility functions.
  */
 
+define('TSITAATCOM_MIGRATE_UID_HANNES', 2);
+define('TSITAATCOM_MIGRATE_ANONYMOUS_IMAGE', 'noauthorimg.jpg');
+
+
  /**
   * Create nice author name.
   */
@@ -96,7 +100,7 @@ function _tsitaatcom_migrate_get_uid($user_name) {
 /**
  * Hack node_save() so the changed field equals created field.
  */
-function _tsitaatcom_node_save($node) {
+function _tsitaatcom_migrate_node_save($node) {
   $transaction = db_transaction();
 
   try {
@@ -227,9 +231,9 @@ function _tsitaatcom_node_save($node) {
 /**
  * Create and set tags.
  */
-function _tsitaatcom_create_tags_and_set_relations($node, $vocabulary_name) {
+function _tsitaatcom_migrate_create_tags_and_set_relations($node, $vocabulary_name) {
   $vocabulary = taxonomy_vocabulary_machine_name_load($vocabulary_name);
-  $tags = explode(",", $node->field_tag_old['und'][0]['value']);
+  $tags = explode(",", $node->field_tag_old[LANGUAGE_NONE][0]['value']);
   foreach($tags as $key => $tag) {
     $tag = trim($tag);
     $terms = taxonomy_get_term_by_name($tag, $vocabulary_name);
@@ -241,7 +245,7 @@ function _tsitaatcom_create_tags_and_set_relations($node, $vocabulary_name) {
       $term->vid = $vocabulary->vid;
       taxonomy_term_save($term);
     }
-    $node->field_tag['und'][]['tid'] = $term->tid;
+    $node->field_tag[LANGUAGE_NONE][]['tid'] = $term->tid;
   }
   return $node;
 }
@@ -249,7 +253,7 @@ function _tsitaatcom_create_tags_and_set_relations($node, $vocabulary_name) {
 /**
  * Set author relations.
  */
-function _tsitaatcom_set_author_relations($node) {
+function _tsitaatcom_migrate_set_author_relations($node) {
   // Set author1 relations.
   {
     $result = db_query('
@@ -266,13 +270,13 @@ function _tsitaatcom_set_author_relations($node) {
      ',
       array(
         ':type' => 'quote',
-        ':author_id_old' => $node->field_id['und'][0]['value'],
+        ':author_id_old' => $node->field_id[LANGUAGE_NONE][0]['value'],
       )
     );
 
     foreach ($result as $item) {
       $note_quote = node_load($item->nid);
-      $note_quote->field_author['und'][0]['target_id'] = $node->nid;
+      $note_quote->field_author[LANGUAGE_NONE][0]['target_id'] = $node->nid;
       node_save($note_quote);
     }
   }
@@ -293,13 +297,13 @@ function _tsitaatcom_set_author_relations($node) {
      ',
       array(
         ':type' => 'quote',
-        ':author2_id_old' => $node->field_id['und'][0]['value'],
+        ':author2_id_old' => $node->field_id[LANGUAGE_NONE][0]['value'],
       )
     );
 
     foreach ($result as $item) {
       $note_quote = node_load($item->nid);
-      $note_quote->field_author['und'][1]['target_id'] = $node->nid;
+      $note_quote->field_author[LANGUAGE_NONE][1]['target_id'] = $node->nid;
       node_save($note_quote);
     }
   }
@@ -308,7 +312,7 @@ function _tsitaatcom_set_author_relations($node) {
 /**
  * Set category relations.
  */
-function _tsitaatcom_set_category_relations($node, $category_id_old) {
+function _tsitaatcom_migrate_set_category_relations($node, $category_id_old) {
   $result = db_query('SELECT tid
     FROM
       {taxonomy_term_data} n
@@ -328,6 +332,108 @@ function _tsitaatcom_set_category_relations($node, $category_id_old) {
   }
 
   // Set category relations.
-  $node->field_category['und'][0]['tid'] = $category_tid;
+  $node->field_category[LANGUAGE_NONE][0]['tid'] = $category_tid;
   return $node;
+}
+
+/**
+ * Create author portrait node, attach image to it and set relation in author node.
+ */
+function _tsitaatcom_migrate_attach_author_portrait($node) {
+  $author_id_old = $node->field_id[LANGUAGE_NONE][0]['value'];
+
+  $connection = Database::getConnection('default', 'tsitaatcom');
+  $query = $connection->select('a_tsitaatcom2_images', 'i');
+  $query
+    ->fields('i', array('id'))
+    ->condition('value', $author_id_old, '=')
+    ->condition('name', 'author_id', '=');
+
+  $result = $query->execute();
+
+  foreach ($result as $index) {
+    $id = $index->id;
+  }
+
+  if (isset($id)) {
+    $connection2 = Database::getConnection('default', 'tsitaatcom');
+    $query2 = $connection2->select('a_tsitaatcom2_images', 'i');
+    $query2
+      ->fields('i', array('name', 'value'))
+      ->condition('id', $id, '=');
+
+    $result = $query2->execute();
+
+    while($record = $result->fetchAssoc()) {
+      if ($record['name'] == 'author_id') {
+        $author_id = $record['value'];
+      }
+      if ($record['name'] == 'nice_name') {
+        $nice_name = $record['value'];
+      }
+      if ($record['name'] == 'url') {
+        $url = $record['value'];
+      }
+    }
+
+    $nid_author_portrait = _tsitaatcom_migrate_get_nid_by_node_title($nice_name);
+    if($nid_author_portrait === FALSE) {
+      $nid_author_portrait = _tsitaatcom_migrate_create_node_quote_author_portrait($nice_name, '/var/www/tsitaat/__files/' . $nice_name);
+    }
+  } else {
+    $nid_author_portrait = _tsitaatcom_migrate_get_nid_by_node_title(TSITAATCOM_MIGRATE_ANONYMOUS_IMAGE);
+
+    if($nid_author_portrait === FALSE) {
+      $nid_author_portrait = _tsitaatcom_migrate_create_node_quote_author_portrait(TSITAATCOM_MIGRATE_ANONYMOUS_IMAGE, '/var/www/tsitaat/__files/noauthorimg.jpg');
+    }
+  }
+
+  // Create reference to the new author portrait node.
+  $node->field_author_portrait_ref[LANGUAGE_NONE][0]['target_id'] = $nid_author_portrait;
+}
+
+/**
+ * Create node type quote_author_portrait and attach image.
+ *
+ */
+function _tsitaatcom_migrate_create_node_quote_author_portrait($name, $filepath) {
+  $node_quote_author_portrait = new stdClass();
+  $node_quote_author_portrait->title = $name;
+  $node_quote_author_portrait->type = 'quote_author_portrait';
+  node_object_prepare($node_quote_author_portrait); // Sets some defaults. Invokes hook_prepare() and hook_node_prepare().
+  $node_quote_author_portrait->language = LANGUAGE_NONE; // Or e.g. 'en' if locale is enabled
+  $node_quote_author_portrait->uid = TSITAATCOM_MIGRATE_UID_HANNES;
+  $node_quote_author_portrait->status = 1; // (1 or 0): published or not
+
+  // Create managed File object and associate with Image field.
+  $file = (object) array(
+    'uid' => TSITAATCOM_MIGRATE_UID_HANNES,
+    'uri' => $filepath,
+    'filemime' => file_get_mimetype($filepath),
+    'status' => 1,
+  );
+
+  // We save the file to the root of the files directory.
+  $file = file_copy($file, 'public://');
+
+  $node_quote_author_portrait->field_quote_author_portrait[LANGUAGE_NONE][0] = (array)$file;
+
+  node_save($node_quote_author_portrait);
+
+  return $node_quote_author_portrait->nid;
+}
+
+/**
+ * Check if node by the defined name exists.
+ *
+ */
+function _tsitaatcom_migrate_get_nid_by_node_title($node_title) {
+  $nid = db_query('SELECT nid FROM node WHERE title = :title', array(
+      ':title' => $node_title))->fetchField();
+
+  if(isset($nid)) {
+    return $nid;
+  } else {
+    return FALSE;
+  }
 }
