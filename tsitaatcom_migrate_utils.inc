@@ -278,6 +278,11 @@ function _tsitaatcom_migrate_set_author_relations($node) {
       $note_quote = node_load($item->nid);
       $note_quote->field_author[LANGUAGE_NONE][0]['target_id'] = $node->nid;
       node_save($note_quote);
+
+      $note_quote->path['source'] = 'node/' . $note_quote->nid;
+      $note_quote->path['alias'] = 'tsitaadid/autorid/' . $node->field_urlfriendly_author_name['und'][0]['value'] . '/' . $note_quote->nid;
+      $note_quote->path['language'] = LANGUAGE_NONE;
+      path_save($note_quote->path);
     }
   }
 
@@ -390,6 +395,7 @@ function _tsitaatcom_migrate_attach_author_portrait($node) {
 
   // Create reference to the new author portrait node.
   $node->field_author_portrait_ref[LANGUAGE_NONE][0]['target_id'] = $nid_author_portrait;
+  $node->field_author_portrait_ref['und'][0]['target_id'];
 }
 
 /**
@@ -416,9 +422,11 @@ function _tsitaatcom_migrate_create_node_quote_author_portrait($name, $filepath)
   // We save the file to the root of the files directory.
   $file = file_copy($file, 'public://');
 
-  $node_quote_author_portrait->field_quote_author_portrait[LANGUAGE_NONE][0] = (array)$file;
+  $node_quote_author_portrait->field_author_portrait[LANGUAGE_NONE][0] = (array)$file;
 
   node_save($node_quote_author_portrait);
+
+  _tsitaatcom_watchdog_author_portrait($name);
 
   return $node_quote_author_portrait->nid;
 }

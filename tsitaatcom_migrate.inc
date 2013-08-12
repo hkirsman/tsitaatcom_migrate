@@ -125,6 +125,7 @@ class TsitaatComQuoteCategoriesMigration extends Migration {
     $this->addFieldMapping('name', 'name_et');
     $this->addFieldMapping('is_new')->defaultValue(FALSE);
     $this->addFieldMapping('uid')->defaultValue(1);
+    $this->addFieldMapping('language')->defaultValue('et');
 
     $this->addFieldMapping('field_id', 'id');
     $this->addFieldMapping('field_name_et', 'name_et');
@@ -157,7 +158,7 @@ class TsitaatComQuotesMigration extends Migration {
 
     $query = $connection->select('a_tsitaatcom2_quotes', 'a_tsitaatcom2_quotes');
 
-    // Get absolutely all quotes.
+    // Get estonian quotes.
     $query
       ->fields(
         'a_tsitaatcom2_quotes',
@@ -209,6 +210,7 @@ class TsitaatComQuotesMigration extends Migration {
     $this->addFieldMapping('nid', 'id');
     $this->addFieldMapping('is_new')->defaultValue(TRUE);
     $this->addFieldMapping('uid')->defaultValue(1);
+    $this->addFieldMapping('language')->defaultValue('et');
 
     $this->addFieldMapping('field_id', 'id');
     $this->addFieldMapping('field_q_id', 'q_id');
@@ -242,6 +244,8 @@ class TsitaatComQuotesMigration extends Migration {
    * Todo. Get second author relationsip.
    */
   public function complete($node, $row) {
+    // Set tag auto field.
+    $node->field_tag_auto[LANGUAGE_NONE][]['value'] = trim($node->field_tag_old[LANGUAGE_NONE][0]['value']);
     // Set category relations.
     _tsitaatcom_migrate_set_category_relations($node, $row->category);
     // Create and set tags.
@@ -332,6 +336,7 @@ class TsitaatComAuthorsMigration extends Migration {
     $this->addFieldMapping('title', 'title');
     $this->addFieldMapping('is_new')->defaultValue(TRUE);
     $this->addFieldMapping('uid')->defaultValue(1);
+    $this->addFieldMapping('language')->defaultValue('et');
 
     $this->addFieldMapping('field_id', 'id');
     // New field.
@@ -377,11 +382,12 @@ class TsitaatComAuthorsMigration extends Migration {
     $this->addFieldMapping('field_urlfriendly_author_name_de', 'url_friendly_author_name_de');
     $this->addFieldMapping('field_active', 'active')->defaultValue(0);
 
-    $this->addUnmigratedDestinations(
+    /*$this->addUnmigratedDestinations(
       array(
         'language',
       )
     );
+    */
   }
 
   /**
@@ -419,7 +425,7 @@ class TsitaatComAuthorsMigration extends Migration {
     }
     $node->field_id[LANGUAGE_NONE][0]['value'] = $row->temp_id;
     $node->promote = 0;
-    $node->language = 'et';
+    //$node->language = 'et';
     if ($row->temp_field_author_born_death_circa == 1) {
       $node->field_author_born_death_circa[LANGUAGE_NONE][0]['value'] = 1;
     }
