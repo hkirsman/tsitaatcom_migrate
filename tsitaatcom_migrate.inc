@@ -254,6 +254,8 @@ class TsitaatComQuotesMigration extends Migration {
     $node->uid = $row->created_by;
     // Set creation date.
     $node->created = _tsitaatcom_mysql_datefield_to_timestamp($row->created_time);
+    // Set default promote to 0.
+    $node->promote = 0;
     // Hack node_save() so it changes 'changed' field equal with created.
     _tsitaatcom_migrate_node_save($node);
   }

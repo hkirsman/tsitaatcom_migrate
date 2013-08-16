@@ -280,6 +280,9 @@ function _tsitaatcom_migrate_set_author_relations($node) {
       node_save($note_quote);
 
       $note_quote->path['source'] = 'node/' . $note_quote->nid;
+      if (strlen(trim($node->field_urlfriendly_author_name['und'][0]['value'])) === 0) {
+        dpm('Warning: ' . $note_quote->nid . ' has empty field_urlfriendly_author_name value.');
+      }
       $note_quote->path['alias'] = 'tsitaadid/autorid/' . $node->field_urlfriendly_author_name['und'][0]['value'] . '/' . $note_quote->nid;
       $note_quote->path['language'] = LANGUAGE_NONE;
       path_save($note_quote->path);
