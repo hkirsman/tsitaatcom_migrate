@@ -236,6 +236,9 @@ function _tsitaatcom_migrate_create_tags_and_set_relations($node, $vocabulary_na
   $tags = explode(",", $node->field_tag_old[LANGUAGE_NONE][0]['value']);
   foreach($tags as $key => $tag) {
     $tag = trim($tag);
+    if (strlen($tag) === 0) {
+      continue;
+    }
     $terms = taxonomy_get_term_by_name($tag, $vocabulary_name);
     if (count($terms)) {
       $term = array_pop($terms);

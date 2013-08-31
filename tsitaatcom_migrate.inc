@@ -245,7 +245,16 @@ class TsitaatComQuotesMigration extends Migration {
    */
   public function complete($node, $row) {
     // Set tag auto field.
-    $node->field_tag_auto[LANGUAGE_NONE][]['value'] = trim($node->field_tag_old[LANGUAGE_NONE][0]['value']);
+    $tags = explode(',', trim($node->field_tag_old[LANGUAGE_NONE][0]['value']));
+    $last_tags_key = end(array_keys($tags));
+    $node->field_tag_auto[LANGUAGE_NONE][0]['value'] = '';
+    foreach($tags as $key => $tag) {
+      if ($key == $last_tags_key) {
+        $node->field_tag_auto[LANGUAGE_NONE][0]['value'] .= trim($tag);
+      } else {
+        $node->field_tag_auto[LANGUAGE_NONE][0]['value'] .= trim($tag) . ', ';
+      }
+    }
     // Set category relations.
     _tsitaatcom_migrate_set_category_relations($node, $row->category);
     // Create and set tags.
