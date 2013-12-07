@@ -474,3 +474,131 @@ class TsitaatComAuthorsMigration extends Migration {
     node_save($node);
   }
 }
+
+/*
+ * Migrate tsitaat.com quote sources.
+ */
+class TsitaatComSourcesMigration extends Migration {
+
+  /**
+   * Implements __construct().
+   */
+  public function __construct() {
+
+    //$this->dependencies = array('TsitaatComQuotes');
+
+    parent::__construct();
+
+    $connection = Database::getConnection('default', 'tsitaatcom');
+
+    $query = $connection->select('a_tsitaatcom2_sources', 'a_tsitaatcom2_sources');
+
+    // Get all sources.
+    $query
+      ->fields(
+        'a_tsitaatcom2_sources',
+        array(
+          'id',
+          'name_et',
+          'name_en',
+          'name_fi',
+          'name_de',
+          'name_fr',
+          'name_hu',
+          'name_cs',
+          'name_it',
+          'name_es',
+          'name_dk',
+          'url_friendly_name_et',
+          'url_friendly_name_en',
+          'url_friendly_name_fi',
+          'url_friendly_name_de',
+          'url_friendly_name_fr',
+          'url_friendly_name_hu',
+          'url_friendly_name_cs',
+          'url_friendly_name_it',
+          'url_friendly_name_es',
+          'url_friendly_name_dk',
+          'source_year_start',
+          'source_year_start_circa',
+          'source_month_start',
+          'source_day_start',
+          'source_year_end',
+          'source_year_end_circa',
+          'url',
+          'amazon_product_link_et',
+          'isbn_et',
+          'amazon_product_link_en',
+          'isbn_en',
+          'amazon_product_link_de',
+          'isbn_de',
+        )
+      )
+      ->orderBy('a_tsitaatcom2_sources.id', 'DESC');
+
+
+    $this->source = new MigrateSourceSQL($query, array(), NULL, array('map_joinable' => FALSE));
+
+    $this->destination = new MigrateDestinationNode('quote_source');
+
+    $this->map = new MigrateSQLMap($this->machineName,
+      array(
+        'id' => array(
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ),
+      ),
+      MigrateDestinationNode::getKeySchema()
+    );
+
+    // Temporary, will set in prepareRow().
+    $this->addFieldMapping('title', 'name_et');
+    $this->addFieldMapping('nid', 'id');
+    $this->addFieldMapping('is_new')->defaultValue(TRUE);
+    $this->addFieldMapping('uid')->defaultValue(1);
+    $this->addFieldMapping('language')->defaultValue('et');
+
+    $this->addFieldMapping('field_qs_id', 'id');
+    $this->addFieldMapping('field_qs_name_et', 'name_et');
+    $this->addFieldMapping('field_qs_name_en', 'name_en');
+    $this->addFieldMapping('field_qs_name_fi', 'name_fi');
+    $this->addFieldMapping('field_qs_name_de', 'name_de');
+    $this->addFieldMapping('field_qs_name_fr', 'name_fr');
+    $this->addFieldMapping('field_qs_name_hu', 'name_hu');
+    $this->addFieldMapping('field_qs_name_cs', 'name_cs');
+    $this->addFieldMapping('field_qs_name_it', 'name_it');
+    $this->addFieldMapping('field_qs_name_es', 'name_es');
+    $this->addFieldMapping('field_qs_name_dk', 'name_dk');
+    $this->addFieldMapping('field_qs_url_friendly_name_et', 'url_friendly_name_et');
+    $this->addFieldMapping('field_qs_url_friendly_name_en', 'url_friendly_name_en');
+    $this->addFieldMapping('field_qs_url_friendly_name_fi', 'url_friendly_name_fi');
+    $this->addFieldMapping('field_qs_url_friendly_name_de', 'url_friendly_name_de');
+    $this->addFieldMapping('field_qs_url_friendly_name_fr', 'url_friendly_name_fr');
+    $this->addFieldMapping('field_qs_url_friendly_name_hu', 'url_friendly_name_hu');
+    $this->addFieldMapping('field_qs_url_friendly_name_cs', 'url_friendly_name_cs');
+    $this->addFieldMapping('field_qs_url_friendly_name_it', 'url_friendly_name_it');
+    $this->addFieldMapping('field_qs_url_friendly_name_es', 'url_friendly_name_es');
+    $this->addFieldMapping('field_qs_url_friendly_name_dk', 'url_friendly_name_dk');
+    $this->addFieldMapping('field_qs_source_year_start', 'source_year_start');
+    $this->addFieldMapping('field_qs_source_year_start_circa', 'source_year_start_circa');
+    $this->addFieldMapping('field_qs_source_month_start', 'source_month_start');
+    $this->addFieldMapping('field_qs_source_day_start', 'source_day_start');
+    $this->addFieldMapping('field_qs_source_year_end', 'source_year_end');
+    $this->addFieldMapping('field_qs_source_year_end_circa', 'source_year_end_circa');
+    $this->addFieldMapping('field_qs_url', 'url');
+    $this->addFieldMapping('field_qs_amazon_product_link_et', 'amazon_product_link_et');
+    $this->addFieldMapping('field_qs_isbn_et', 'isbn_et');
+    $this->addFieldMapping('field_qs_amazon_product_link_en', 'amazon_product_link_en');
+    $this->addFieldMapping('field_qs_isbn_en', 'isbn_en');
+    $this->addFieldMapping('field_qs_amazon_product_link_de', 'amazon_product_link_de');
+    $this->addFieldMapping('field_qs_isbn_de', 'isbn_de');
+  }
+
+  /**
+   * Implements complete().
+   */
+  public function complete($node, $row) {
+
+  }
+}
