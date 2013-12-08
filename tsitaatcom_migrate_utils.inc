@@ -321,6 +321,35 @@ function _tsitaatcom_migrate_set_author_relations($node) {
 }
 
 /**
+ * Set quote source relations.
+ */
+function _tsitaatcom_migrate_set_quote_source_relations($node) {
+  $result = db_query('
+    SELECT nid
+    FROM
+      {node} n
+    LEFT JOIN
+      {field_data_field_source_id} source_id_old ON
+      n.nid = source_id_old.entity_id
+    WHERE
+      field_source_id_value = :source_id_old
+    AND
+      type = :type
+   ',
+    array(
+      ':type' => 'quote',
+      ':source_id_old' => $node->field_qs_id[LANGUAGE_NONE][0]['value'],
+    )
+  );
+
+  foreach ($result as $item) {
+    $note_quote = node_load($item->nid);
+    $note_quote->field_q_source[LANGUAGE_NONE][0]['target_id'] = $node->nid;
+    node_save($note_quote);
+  }
+}
+
+/**
  * Set category relations.
  */
 function _tsitaatcom_migrate_set_category_relations($node, $category_id_old) {

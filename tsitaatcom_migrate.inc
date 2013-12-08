@@ -552,14 +552,13 @@ class TsitaatComSourcesMigration extends Migration {
       MigrateDestinationNode::getKeySchema()
     );
 
-    // Temporary, will set in prepareRow().
     $this->addFieldMapping('title', 'name_et');
-    $this->addFieldMapping('nid', 'id');
     $this->addFieldMapping('is_new')->defaultValue(TRUE);
     $this->addFieldMapping('uid')->defaultValue(1);
     $this->addFieldMapping('language')->defaultValue('et');
 
     $this->addFieldMapping('field_qs_id', 'id');
+    $this->addFieldMapping('field_qs_name', 'name_et');
     $this->addFieldMapping('field_qs_name_et', 'name_et');
     $this->addFieldMapping('field_qs_name_en', 'name_en');
     $this->addFieldMapping('field_qs_name_fi', 'name_fi');
@@ -599,6 +598,9 @@ class TsitaatComSourcesMigration extends Migration {
    * Implements complete().
    */
   public function complete($node, $row) {
+    _tsitaatcom_watchdog_quote_source($node);
 
+    // Set source relations for quotations.
+    _tsitaatcom_migrate_set_quote_source_relations($node);
   }
 }
