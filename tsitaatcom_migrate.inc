@@ -569,6 +569,7 @@ class TsitaatComSourcesMigration extends Migration {
     $this->addFieldMapping('field_qs_name_it', 'name_it');
     $this->addFieldMapping('field_qs_name_es', 'name_es');
     $this->addFieldMapping('field_qs_name_dk', 'name_dk');
+    $this->addFieldMapping('field_qs_url_friendly_name')->defaultValue('');
     $this->addFieldMapping('field_qs_url_friendly_name_et', 'url_friendly_name_et');
     $this->addFieldMapping('field_qs_url_friendly_name_en', 'url_friendly_name_en');
     $this->addFieldMapping('field_qs_url_friendly_name_fi', 'url_friendly_name_fi');
