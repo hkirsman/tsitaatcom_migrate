@@ -236,7 +236,7 @@ function _tsitaatcom_migrate_create_tags_and_set_relations($node, $vocabulary_na
   $tags = explode(",", $node->field_tag_old[LANGUAGE_NONE][0]['value']);
   foreach($tags as $key => $tag) {
     $tag = trim($tag);
-    if (strlen($tag) === 0) {
+    if (drupal_strlen($tag) === 0) {
       continue;
     }
     $terms = taxonomy_get_term_by_name($tag, $vocabulary_name);
@@ -283,7 +283,7 @@ function _tsitaatcom_migrate_set_author_relations($node) {
       node_save($note_quote);
 
       $note_quote->path['source'] = 'node/' . $note_quote->nid;
-      if (strlen(trim($node->field_urlfriendly_author_name['und'][0]['value'])) === 0) {
+      if (drupal_strlen(trim($node->field_urlfriendly_author_name['und'][0]['value'])) === 0) {
         dpm('Warning: ' . $note_quote->nid . ' has empty field_urlfriendly_author_name value.');
       }
       $note_quote->path['alias'] = 'tsitaadid/autorid/' . $node->field_urlfriendly_author_name['und'][0]['value'] . '/' . $note_quote->nid;

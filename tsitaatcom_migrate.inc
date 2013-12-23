@@ -150,7 +150,7 @@ class TsitaatComQuotesMigration extends Migration {
    */
   public function __construct() {
 
-    $this->dependencies = array('TsitaatComUser', 'TsitaatComQuoteCategories');
+    $this->dependencies = array('TsitaatComQuoteCategories');
 
     parent::__construct();
 
@@ -175,8 +175,8 @@ class TsitaatComQuotesMigration extends Migration {
           'author2_id',
           'source_id',
           'source_title',
-          'source_title_extra_sufix',
           'source_title_extra_prefix',
+          'source_title_extra_sufix',
           'source_year_start',
           'source_year_start_circa',
           'source_year_end',
@@ -224,8 +224,8 @@ class TsitaatComQuotesMigration extends Migration {
     $this->addFieldMapping('field_author2_id', 'author2_id');
     $this->addFieldMapping('field_source_id', 'source_id');
     $this->addFieldMapping('field_source_title', 'source_title');
-    $this->addFieldMapping('field_source_title_extra_sufix', 'source_title_extra_sufix');
-    $this->addFieldMapping('field_source_title_extra_prefix', 'source_title_extra_prefix');
+    $this->addFieldMapping('field_q_source_title_xtra_prefix', 'source_title_extra_prefix');
+    $this->addFieldMapping('field_q_source_title_xtra_suffix', 'source_title_extra_sufix');
     $this->addFieldMapping('field_source_year_start', 'source_year_start');
     $this->addFieldMapping('field_source_year_start_circa', 'source_year_start_circa');
     $this->addFieldMapping('field_source_year_end', 'source_year_end');
@@ -485,7 +485,7 @@ class TsitaatComSourcesMigration extends Migration {
    */
   public function __construct() {
 
-    //$this->dependencies = array('TsitaatComQuotes');
+    $this->dependencies = array('TsitaatComQuotes');
 
     parent::__construct();
 
