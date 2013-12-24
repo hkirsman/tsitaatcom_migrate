@@ -212,29 +212,14 @@ class TsitaatComQuotesMigration extends Migration {
     $this->addFieldMapping('uid')->defaultValue(1);
     $this->addFieldMapping('language')->defaultValue('et');
 
-    $this->addFieldMapping('field_id', 'id');
-    $this->addFieldMapping('field_q_id', 'q_id');
-    $this->addFieldMapping('field_lang', 'lang');
-    $this->addFieldMapping('field_rank', 'rank');
-    $this->addFieldMapping('field_quote', 'quote');
-    $this->addFieldMapping('field_category_old', 'category');
-    $this->addFieldMapping('field_zitate_de_category', 'zitate_de_category');
-    $this->addFieldMapping('field_tag_old', 'tag');
-    $this->addFieldMapping('field_author_id', 'author_id');
-    $this->addFieldMapping('field_author2_id', 'author2_id');
-    $this->addFieldMapping('field_source_id', 'source_id');
-    $this->addFieldMapping('field_source_title', 'source_title');
+    $this->addFieldMapping('field_q_rank', 'rank');
+    $this->addFieldMapping('field_q_quote', 'quote');
     $this->addFieldMapping('field_q_source_title_xtra_prefix', 'source_title_extra_prefix');
     $this->addFieldMapping('field_q_source_title_xtra_suffix', 'source_title_extra_sufix');
-    $this->addFieldMapping('field_source_year_start', 'source_year_start');
-    $this->addFieldMapping('field_source_year_start_circa', 'source_year_start_circa');
-    $this->addFieldMapping('field_source_year_end', 'source_year_end');
-    $this->addFieldMapping('field_created_by', 'created_by');
-    $this->addFieldMapping('field_created_by_old', 'created_by');
-    // Todo. Check if this needs to be recalculated and this field should be date!
-    $this->addFieldMapping('field_created_time', 'created_time');
-    $this->addFieldMapping('field_revision', 'revision');
-    $this->addFieldMapping('field_active', 'active');
+    // Fields needed for migration.
+    $this->addFieldMapping('field_q_author_id_old', 'author_id');
+    $this->addFieldMapping('field_q_author2_id_old', 'author2_id');
+    $this->addFieldMapping('field_q_source_id_old', 'source_id');
   }
 
   /**
@@ -245,20 +230,20 @@ class TsitaatComQuotesMigration extends Migration {
    */
   public function complete($node, $row) {
     // Set tag auto field.
-    $tags = explode(',', trim($node->field_tag_old[LANGUAGE_NONE][0]['value']));
+    $tags = explode(',', trim($row->tag));
     $last_tags_key = end(array_keys($tags));
-    $node->field_tag_auto[LANGUAGE_NONE][0]['value'] = '';
+    $node->field_q_tag_auto[LANGUAGE_NONE][0]['value'] = '';
     foreach($tags as $key => $tag) {
       if ($key == $last_tags_key) {
-        $node->field_tag_auto[LANGUAGE_NONE][0]['value'] .= trim($tag);
+        $node->field_q_tag_auto[LANGUAGE_NONE][0]['value'] .= trim($tag);
       } else {
-        $node->field_tag_auto[LANGUAGE_NONE][0]['value'] .= trim($tag) . ', ';
+        $node->field_q_tag_auto[LANGUAGE_NONE][0]['value'] .= trim($tag) . ', ';
       }
     }
     // Set category relations.
     _tsitaatcom_migrate_set_category_relations($node, $row->category);
     // Create and set tags.
-    $node = _tsitaatcom_migrate_create_tags_and_set_relations($node, 'quote_tag');
+    $node = _tsitaatcom_migrate_create_tags_and_set_relations($node, $row, 'quote_tag');
     // Set correct uid.
     $node->uid = $row->created_by;
     // Set creation date.

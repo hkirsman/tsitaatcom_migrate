@@ -231,9 +231,9 @@ function _tsitaatcom_migrate_node_save($node) {
 /**
  * Create and set tags.
  */
-function _tsitaatcom_migrate_create_tags_and_set_relations($node, $vocabulary_name) {
+function _tsitaatcom_migrate_create_tags_and_set_relations($node, $row, $vocabulary_name) {
   $vocabulary = taxonomy_vocabulary_machine_name_load($vocabulary_name);
-  $tags = explode(",", $node->field_tag_old[LANGUAGE_NONE][0]['value']);
+  $tags = explode(",", $row->tag);
   foreach($tags as $key => $tag) {
     $tag = trim($tag);
     if (drupal_strlen($tag) === 0) {
@@ -248,7 +248,7 @@ function _tsitaatcom_migrate_create_tags_and_set_relations($node, $vocabulary_na
       $term->vid = $vocabulary->vid;
       taxonomy_term_save($term);
     }
-    $node->field_tag[LANGUAGE_NONE][]['tid'] = $term->tid;
+    $node->field_q_tag[LANGUAGE_NONE][]['tid'] = $term->tid;
   }
   return $node;
 }
@@ -264,10 +264,10 @@ function _tsitaatcom_migrate_set_author_relations($node) {
       FROM
         {node} n
       LEFT JOIN
-        {field_data_field_author_id} author_id_old ON
+        {field_data_field_q_author_id_old} author_id_old ON
         n.nid = author_id_old.entity_id
       WHERE
-        field_author_id_value = :author_id_old
+        field_q_author_id_old_value = :author_id_old
       AND
         type = :type
      ',
@@ -279,7 +279,7 @@ function _tsitaatcom_migrate_set_author_relations($node) {
 
     foreach ($result as $item) {
       $note_quote = node_load($item->nid);
-      $note_quote->field_author[LANGUAGE_NONE][0]['target_id'] = $node->nid;
+      $note_quote->field_q_author[LANGUAGE_NONE][0]['target_id'] = $node->nid;
       node_save($note_quote);
 
       $note_quote->path['source'] = 'node/' . $note_quote->nid;
@@ -299,10 +299,10 @@ function _tsitaatcom_migrate_set_author_relations($node) {
       FROM
         {node} n
       LEFT JOIN
-        {field_data_field_author2_id} author2_id_old ON
+        {field_data_field_q_author2_id_old} author2_id_old ON
         n.nid = author2_id_old.entity_id
       WHERE
-        field_author2_id_value = :author2_id_old
+        field_q_author2_id_old_value = :author2_id_old
       AND
         type = :type
      ',
@@ -314,7 +314,7 @@ function _tsitaatcom_migrate_set_author_relations($node) {
 
     foreach ($result as $item) {
       $note_quote = node_load($item->nid);
-      $note_quote->field_author[LANGUAGE_NONE][1]['target_id'] = $node->nid;
+      $note_quote->field_q_author[LANGUAGE_NONE][1]['target_id'] = $node->nid;
       node_save($note_quote);
     }
   }
@@ -329,10 +329,10 @@ function _tsitaatcom_migrate_set_quote_source_relations($node) {
     FROM
       {node} n
     LEFT JOIN
-      {field_data_field_source_id} source_id_old ON
+      {field_data_field_q_source_id_old} source_id_old ON
       n.nid = source_id_old.entity_id
     WHERE
-      field_source_id_value = :source_id_old
+      field_q_source_id_old_value = :source_id_old
     AND
       type = :type
    ',
