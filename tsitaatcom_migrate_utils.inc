@@ -505,6 +505,7 @@ function _tsitaatcom_migrate_set_translations($node, $row) {
     ))->fetchAll(PDO::FETCH_ASSOC);
   db_set_active();
 
+  $translations = array();
   foreach($results as $result) {
     $translation = array(
       'translate' => 0,
@@ -516,5 +517,10 @@ function _tsitaatcom_migrate_set_translations($node, $row) {
     $values['field_q_quote'][$result['lang']]['0']['value'] = $result['quote'];
     $handler->setTranslation($translation, $values);
     field_attach_update('node', $node);
+
+    $translations[$result['lang']] = $result['lang'];
   }
+
+  $node->field_q_language_auto[LANGUAGE_NONE][0]['value'] = serialize($translations);
+  field_attach_update('node', $node);
 }
