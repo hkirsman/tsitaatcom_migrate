@@ -480,3 +480,41 @@ function _tsitaatcom_migrate_get_nid_by_node_title($node_title) {
     return FALSE;
   }
 }
+
+/**
+ * Set translations for quote.
+ * Help from https://drupal.org/node/1069774
+ * @param  object $node Node object
+ * @param  object $row  Row object from the old database
+ * @return void
+ */
+function _tsitaatcom_migrate_set_translations($node, $row) {
+  db_set_active('tsitaatcom');
+  $results = db_query('
+    SELECT
+      lang,
+      quote
+    FROM
+      a_tsitaatcom2_quotes
+    WHERE
+      q_id = :quote_id
+    AND
+      lang != \'et\';
+    ', array(
+      ':quote_id' => $row->id
+    ))->fetchAll(PDO::FETCH_ASSOC);
+  db_set_active();
+
+  foreach($results as $result) {
+    $translation = array(
+      'translate' => 0,
+      'status' => 1,
+      'language' => $result['lang'], // here is the language you're translating to
+      'source' => 'et', // here is the source language
+    );
+    $handler = entity_translation_get_handler('node', $node);
+    $values['field_q_quote'][$result['lang']]['0']['value'] = $result['quote'];
+    $handler->setTranslation($translation, $values);
+    field_attach_update('node', $node);
+  }
+}

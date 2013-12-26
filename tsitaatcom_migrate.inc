@@ -240,6 +240,8 @@ class TsitaatComQuotesMigration extends Migration {
         $node->field_q_tag_auto[LANGUAGE_NONE][0]['value'] .= trim($tag) . ', ';
       }
     }
+    // Set translations.
+    _tsitaatcom_migrate_set_translations($node, $row);
     // Set category relations.
     _tsitaatcom_migrate_set_category_relations($node, $row->category);
     // Create and set tags.
