@@ -278,17 +278,17 @@ function _tsitaatcom_migrate_set_author_relations($node) {
     );
 
     foreach ($result as $item) {
-      $note_quote = node_load($item->nid);
-      $note_quote->field_q_author[LANGUAGE_NONE][0]['target_id'] = $node->nid;
-      node_save($note_quote);
+      $node_quote = node_load($item->nid);
+      $node_quote->field_q_author[LANGUAGE_NONE][0]['target_id'] = $node->nid;
+      field_attach_update('node', $node_quote);
 
-      $note_quote->path['source'] = 'node/' . $note_quote->nid;
+      $node_quote->path['source'] = 'node/' . $node_quote->nid;
       if (drupal_strlen(trim($node->field_urlfriendly_author_name['und'][0]['value'])) === 0) {
-        dpm('Warning: ' . $note_quote->nid . ' has empty field_urlfriendly_author_name value.');
+        dpm('Warning: ' . $node_quote->nid . ' has empty field_urlfriendly_author_name value.');
       }
-      $note_quote->path['alias'] = 'tsitaadid/autorid/' . $node->field_urlfriendly_author_name['und'][0]['value'] . '/' . $note_quote->nid;
-      $note_quote->path['language'] = LANGUAGE_NONE;
-      path_save($note_quote->path);
+      $node_quote->path['alias'] = 'tsitaadid/autorid/' . $node->field_urlfriendly_author_name['und'][0]['value'] . '/' . $node_quote->nid;
+      $node_quote->path['language'] = LANGUAGE_NONE;
+      path_save($node_quote->path);
     }
   }
 
@@ -313,9 +313,9 @@ function _tsitaatcom_migrate_set_author_relations($node) {
     );
 
     foreach ($result as $item) {
-      $note_quote = node_load($item->nid);
-      $note_quote->field_q_author[LANGUAGE_NONE][1]['target_id'] = $node->nid;
-      node_save($note_quote);
+      $node_quote = node_load($item->nid);
+      $node_quote->field_q_author[LANGUAGE_NONE][1]['target_id'] = $node->nid;
+      field_attach_update('node', $node_quote);
     }
   }
 }
@@ -343,9 +343,9 @@ function _tsitaatcom_migrate_set_quote_source_relations($node) {
   );
 
   foreach ($result as $item) {
-    $note_quote = node_load($item->nid);
-    $note_quote->field_q_source[LANGUAGE_NONE][0]['target_id'] = $node->nid;
-    node_save($note_quote);
+    $node_quote = node_load($item->nid);
+    $node_quote->field_q_source[LANGUAGE_NONE][0]['target_id'] = $node->nid;
+    field_attach_update('node', $node_quote);
   }
 }
 
@@ -431,6 +431,7 @@ function _tsitaatcom_migrate_attach_author_portrait($node) {
   // Create reference to the new author portrait node.
   $node->field_author_portrait_ref[LANGUAGE_NONE][0]['target_id'] = $nid_author_portrait;
   $node->field_author_portrait_ref['und'][0]['target_id'];
+  field_attach_update('node', $node);
 }
 
 /**

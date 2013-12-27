@@ -269,7 +269,7 @@ class TsitaatComAuthorsMigration extends Migration {
    */
   public function __construct() {
 
-    $this->dependencies = array('TsitaatComQuotes');
+    //$this->dependencies = array('TsitaatComQuotes');
 
     parent::__construct();
 
@@ -332,11 +332,13 @@ class TsitaatComAuthorsMigration extends Migration {
       MigrateDestinationNode::getKeySchema()
     );
 
-    // Temporary - will set in prepareRow().
+    // Temporary name for title - will set in prepareRow().
     $this->addFieldMapping('title', 'title');
     $this->addFieldMapping('is_new')->defaultValue(TRUE);
     $this->addFieldMapping('uid')->defaultValue(1);
     $this->addFieldMapping('language')->defaultValue('et');
+    $this->addFieldMapping('status', 'active');
+    $this->addFieldMapping('promote')->defaultValue(0);
 
     $this->addFieldMapping('field_id', 'id');
     // New field.
@@ -381,13 +383,6 @@ class TsitaatComAuthorsMigration extends Migration {
     $this->addFieldMapping('field_urlfriendly_author_name_en', 'url_friendly_author_name_en');
     $this->addFieldMapping('field_urlfriendly_author_name_de', 'url_friendly_author_name_de');
     $this->addFieldMapping('field_active', 'active')->defaultValue(0);
-
-    /*$this->addUnmigratedDestinations(
-      array(
-        'language',
-      )
-    );
-    */
   }
 
   /**
@@ -415,17 +410,8 @@ class TsitaatComAuthorsMigration extends Migration {
    * Change status and id.
    */
   public function complete($node, $row) {
-    // Todo: could I check for if ($row->temp_field_active == 1)  also?
-    if ($row->active == 0) {
-      $node->status = 0;
-      $node->field_active[LANGUAGE_NONE][0]['value'] = 0;
-    } else {
-      $node->status = 1;
-      $node->field_active[LANGUAGE_NONE][0]['value'] = 1;
-    }
     $node->field_id[LANGUAGE_NONE][0]['value'] = $row->temp_id;
-    $node->promote = 0;
-    //$node->language = 'et';
+
     if ($row->temp_field_author_born_death_circa == 1) {
       $node->field_author_born_death_circa[LANGUAGE_NONE][0]['value'] = 1;
     }
@@ -460,7 +446,7 @@ class TsitaatComAuthorsMigration extends Migration {
     // Add author portrait.
     _tsitaatcom_migrate_attach_author_portrait($node);
 
-    node_save($node);
+    field_attach_update('node', $node);
   }
 }
 
