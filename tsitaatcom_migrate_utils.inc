@@ -283,10 +283,10 @@ function _tsitaatcom_migrate_set_author_relations($node) {
       field_attach_update('node', $node_quote);
 
       $node_quote->path['source'] = 'node/' . $node_quote->nid;
-      if (drupal_strlen(trim($node->field_urlfriendly_author_name['und'][0]['value'])) === 0) {
+      if (drupal_strlen(trim($node->field_urlfriendly_author_name[LANGUAGE_NONE][0]['value'])) === 0) {
         dpm('Warning: ' . $node_quote->nid . ' has empty field_urlfriendly_author_name value.');
       }
-      $node_quote->path['alias'] = 'tsitaadid/autorid/' . $node->field_urlfriendly_author_name['und'][0]['value'] . '/' . $node_quote->nid;
+      $node_quote->path['alias'] = 'tsitaadid/autorid/' . $node->field_urlfriendly_author_name[LANGUAGE_NONE][0]['value'] . '/' . $node_quote->nid;
       $node_quote->path['language'] = LANGUAGE_NONE;
       path_save($node_quote->path);
     }
@@ -430,7 +430,7 @@ function _tsitaatcom_migrate_attach_author_portrait($node) {
 
   // Create reference to the new author portrait node.
   $node->field_author_portrait_ref[LANGUAGE_NONE][0]['target_id'] = $nid_author_portrait;
-  $node->field_author_portrait_ref['und'][0]['target_id'];
+  $node->field_author_portrait_ref[LANGUAGE_NONE][0]['target_id'];
   field_attach_update('node', $node);
 }
 
