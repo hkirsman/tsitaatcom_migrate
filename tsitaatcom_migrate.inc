@@ -20,62 +20,62 @@ include_once 'tsitaatcom_migrate_utils.inc';
  * Last login is not imported. I think there isn't such a field in phpbb
  * and it's good not to import it to check later who has logged into new system.
  */
-class TsitaatComUserMigration extends Migration {
-  /**
-   * Implements __construct().
-   */
-  public function __construct() {
+// class TsitaatComUserMigration extends Migration {
+//   /**
+//    * Implements __construct().
+//    */
+//   public function __construct() {
 
-    parent::__construct();
+//     parent::__construct();
 
-    $connection = Database::getConnection('default', 'tsitaatcom');
+//     $connection = Database::getConnection('default', 'tsitaatcom');
 
-    $query = $connection->select('phpbb_users', 'users');
+//     $query = $connection->select('phpbb_users', 'users');
 
-    $query->fields(
-      'users',
-      array(
-        'user_id',
-        'username_clean',
-        'user_email',
-        'user_regdate',
-        'user_lastactivity',
-      )
-    )
-    ->condition(db_or()
-      ->condition('user_type', 0)
-      ->condition('group_id', 5)
-    );
+//     $query->fields(
+//       'users',
+//       array(
+//         'user_id',
+//         'username_clean',
+//         'user_email',
+//         'user_regdate',
+//         'user_lastactivity',
+//       )
+//     )
+//     ->condition(db_or()
+//       ->condition('user_type', 0)
+//       ->condition('group_id', 5)
+//     );
 
-    $this->source = new MigrateSourceSQL($query, array(), NULL, array('map_joinable' => FALSE));
+//     $this->source = new MigrateSourceSQL($query, array(), NULL, array('map_joinable' => FALSE));
 
-    $this->destination = new MigrateDestinationUser();
+//     $this->destination = new MigrateDestinationUser();
 
-    $this->map = new MigrateSQLMap(
-      $this->machineName,
-      array(
-        'user_id' => array(
-          'type' => 'int',
-          'unsigned' => TRUE,
-          'not null' => TRUE,
-        ),
-      ),
-      MigrateDestinationUser::getKeySchema()
-    );
+//     $this->map = new MigrateSQLMap(
+//       $this->machineName,
+//       array(
+//         'user_id' => array(
+//           'type' => 'int',
+//           'unsigned' => TRUE,
+//           'not null' => TRUE,
+//         ),
+//       ),
+//       MigrateDestinationUser::getKeySchema()
+//     );
 
-    $this->addFieldMapping('uid', 'user_id');
-    // To set custom uid.
-    $this->addFieldMapping('is_new')->defaultValue(TRUE);
-    $this->addFieldMapping('name', 'username_clean');
-    $this->addFieldMapping('mail', 'user_email');
-    $this->addFieldMapping('created', 'user_regdate');
-    $this->addUnmigratedDestinations(array('theme', 'signature', 'access', 'login',
-      'timezone', 'language', 'picture', 'signature_format', 'init'));
-    // Is this correct?
-    // $this->addFieldMapping('access', 'user_lastactivity');
-    // $this->addUnmigratedDestinations(array('status'));
-  }
-}
+//     $this->addFieldMapping('uid', 'user_id');
+//     // To set custom uid.
+//     $this->addFieldMapping('is_new')->defaultValue(TRUE);
+//     $this->addFieldMapping('name', 'username_clean');
+//     $this->addFieldMapping('mail', 'user_email');
+//     $this->addFieldMapping('created', 'user_regdate');
+//     $this->addUnmigratedDestinations(array('theme', 'signature', 'access', 'login',
+//       'timezone', 'language', 'picture', 'signature_format', 'init'));
+//     // Is this correct?
+//     // $this->addFieldMapping('access', 'user_lastactivity');
+//     // $this->addUnmigratedDestinations(array('status'));
+//   }
+// }
 
 /*
  * Migrate tsitaat.com categories.

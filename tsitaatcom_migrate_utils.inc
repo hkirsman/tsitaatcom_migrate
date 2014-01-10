@@ -372,7 +372,7 @@ function _tsitaatcom_migrate_set_category_relations($node, $category_id_old) {
   }
 
   // Set category relations.
-  $node->field_category[LANGUAGE_NONE][0]['tid'] = $category_tid;
+  $node->field_q_category[LANGUAGE_NONE][0]['tid'] = $category_tid;
   return $node;
 }
 
