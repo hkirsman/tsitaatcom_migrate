@@ -211,6 +211,7 @@ class TsitaatComQuotesMigration extends Migration {
     $this->addFieldMapping('is_new')->defaultValue(TRUE);
     $this->addFieldMapping('uid')->defaultValue(1);
     $this->addFieldMapping('language')->defaultValue('et');
+    $this->addFieldMapping('status', 'active');
 
      // Probably don't need to define field_q_language_auto here.
     $this->addFieldMapping('field_q_language_auto')->defaultValue(serialize(array()));
