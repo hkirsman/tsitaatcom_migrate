@@ -283,10 +283,10 @@ function _tsitaatcom_migrate_set_author_relations($node) {
       field_attach_update('node', $node_quote);
 
       $node_quote->path['source'] = 'node/' . $node_quote->nid;
-      if (drupal_strlen(trim($node->field_urlfriendly_author_name[LANGUAGE_NONE][0]['value'])) === 0) {
-        dpm('Warning: ' . $node_quote->nid . ' has empty field_urlfriendly_author_name value.');
+      if (drupal_strlen(trim($node->field_qa_url_alias[LANGUAGE_NONE][0]['value'])) === 0) {
+        dpm('Warning: ' . $node_quote->nid . ' has empty field_qa_url_alias value.');
       }
-      $node_quote->path['alias'] = 'tsitaadid/autorid/' . $node->field_urlfriendly_author_name[LANGUAGE_NONE][0]['value'] . '/' . $node_quote->nid;
+      $node_quote->path['alias'] = 'tsitaadid/autorid/' . $node->field_qa_url_alias[LANGUAGE_NONE][0]['value'] . '/' . $node_quote->nid;
       $node_quote->path['language'] = LANGUAGE_NONE;
       path_save($node_quote->path);
     }
@@ -380,7 +380,7 @@ function _tsitaatcom_migrate_set_category_relations($node, $category_id_old) {
  * Create author portrait node, attach image to it and set relation in author node.
  */
 function _tsitaatcom_migrate_attach_author_portrait($node) {
-  $author_id_old = $node->field_id[LANGUAGE_NONE][0]['value'];
+  $author_id_old = $node->field_qa_id[LANGUAGE_NONE][0]['value'];
 
   $connection = Database::getConnection('default', 'tsitaatcom');
   $query = $connection->select('a_tsitaatcom2_images', 'i');
@@ -429,8 +429,7 @@ function _tsitaatcom_migrate_attach_author_portrait($node) {
   }
 
   // Create reference to the new author portrait node.
-  $node->field_author_portrait_ref[LANGUAGE_NONE][0]['target_id'] = $nid_author_portrait;
-  $node->field_author_portrait_ref[LANGUAGE_NONE][0]['target_id'];
+  $node->field_qa_portrait_ref[LANGUAGE_NONE][0]['target_id'] = $nid_author_portrait;
   field_attach_update('node', $node);
 }
 
@@ -448,23 +447,38 @@ function _tsitaatcom_migrate_create_node_quote_author_portrait($name, $filepath)
   $node_quote_author_portrait->status = 1; // (1 or 0): published or not
 
   // Create managed File object and associate with Image field.
-  $file = (object) array(
+  $portrait_field_instance = field_info_instance('node', 'field_qap_portrait', 'quote_author_portrait');
+  $file_source = (object) array(
     'uid' => TSITAATCOM_MIGRATE_UID_HANNES,
     'uri' => $filepath,
     'filemime' => file_get_mimetype($filepath),
     'status' => 1,
   );
 
-  // We save the file to the root of the files directory.
-  $file = file_copy($file, 'public://');
+  $directory = 'public://' . $portrait_field_instance['settings']['file_directory'];
 
-  $node_quote_author_portrait->field_author_portrait[LANGUAGE_NONE][0] = (array)$file;
+  // Create the directory if it doesn't exist.
+  file_prepare_directory($directory, FILE_CREATE_DIRECTORY);
+
+  // Copy the file over.
+  $file_target = file_copy($file_source, $directory, FILE_EXISTS_REPLACE);
+
+  $node_quote_author_portrait->field_qap_portrait[LANGUAGE_NONE][0] = (array)$file_target;
 
   node_save($node_quote_author_portrait);
 
   _tsitaatcom_watchdog_author_portrait($name);
 
   return $node_quote_author_portrait->nid;
+
+
+
+  // Create the directory if it doesn't exist.
+  $directory = PERFECTO_FILE_PATH;
+  file_prepare_directory($directory, FILE_CREATE_DIRECTORY);
+
+  // Copy the file over.
+  $filename = file_unmanaged_copy($file->uri, $directory, FILE_EXISTS_REPLACE);
 }
 
 /**
