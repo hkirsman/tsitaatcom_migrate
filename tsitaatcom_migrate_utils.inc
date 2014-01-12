@@ -531,7 +531,6 @@ function _tsitaatcom_migrate_set_translations($node, $row) {
  * @return void
  */
 function _tsitaatcom_row_cleanup(&$node) {
-  /*
   foreach($node as $key => &$line) {
     if (strpos($key, 'field_') === 0 && is_array($line) && count($line)) {
       foreach($line as &$langs) {
@@ -541,5 +540,4 @@ function _tsitaatcom_row_cleanup(&$node) {
       }
     }
   }
-  */
 }
