@@ -225,6 +225,10 @@ class TsitaatComQuotesMigration extends Migration {
     $this->addFieldMapping('field_q_source_id_old', 'source_id');
   }
 
+  public function prepare($node, $row) {
+    _tsitaatcom_row_cleanup($node);
+  }
+
   /**
    * Implements complete().
    *
@@ -341,20 +345,14 @@ class TsitaatComAuthorsMigration extends Migration {
     $this->addFieldMapping('status', 'active');
     $this->addFieldMapping('promote')->defaultValue(0);
 
-
-    // New field.
     $this->addFieldMapping('field_qa_name_freeform', 'author_name_freeform_et');
-    // New field.
     $this->addFieldMapping('field_qa_firstname', 'author_firstname_et');
-    // New field.
     $this->addFieldMapping('field_qa_midname', 'author_midname_et');
-    // New field.
     $this->addFieldMapping('field_qa_lastname', 'author_lastname_et');
     $this->addFieldMapping('field_qa_born_year', 'author_born');
     $this->addFieldMapping('field_qa_born_year_circa', 'author_born_circa')->defaultValue(0);
     $this->addFieldMapping('field_qa_death_year', 'author_death');
     $this->addFieldMapping('field_qa_death_year_circa', 'author_death_circa')->defaultValue(0);
-    // New field.
     $this->addFieldMapping('field_qa_profession', 'author_profession_et');
     $this->addFieldMapping('field_qa_is_tsitaatcom_user', 'is_tsitaatcom_user')->defaultValue(0);
     $this->addFieldMapping('field_qa_wiki_url', 'author_wiki_url_et');
@@ -363,17 +361,14 @@ class TsitaatComAuthorsMigration extends Migration {
     $this->addFieldMapping('field_active', 'active')->defaultValue(0);
   }
 
+  public function prepare($node, $row) {
+    _tsitaatcom_row_cleanup($node);
+  }
+
   /**
    * Implements prepareRow().
    */
   public function prepareRow($current_row) {
-    $author_title = _tsitaatcom_migrate_quote_author_title(
-      $current_row->author_name_freeform_et,
-      $current_row->author_firstname_et,
-      $current_row->author_midname_et,
-      $current_row->author_lastname_et
-    );
-    $current_row->title = $author_title;
     /*
     $current_row->temp_id = $current_row->id;
     $current_row->temp_field_author_born_death_circa = $current_row->author_born_death_circa;
@@ -523,6 +518,10 @@ class TsitaatComSourcesMigration extends Migration {
     $this->addFieldMapping('field_qs_amazon_product_link', 'amazon_product_link_et');
     $this->addFieldMapping('field_qs_isbn', 'isbn_et');
     $this->addFieldMapping('field_qs_url_alias', 'url_friendly_name_et')->defaultValue('');
+  }
+
+  public function prepare($node, $row) {
+    _tsitaatcom_row_cleanup($node);
   }
 
   /**

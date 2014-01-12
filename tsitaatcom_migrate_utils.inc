@@ -9,21 +9,6 @@ define('TSITAATCOM_MIGRATE_UID_HANNES', 2);
 define('TSITAATCOM_MIGRATE_ANONYMOUS_IMAGE', 'noauthorimg.jpg');
 
 
- /**
-  * Create nice author name.
-  */
-function _tsitaatcom_migrate_quote_author_title($author_name_freeform, $author_firstname, $author_midname, $author_lastname) {
-
-  if (drupal_strlen(trim($author_name_freeform))) {
-    return trim($author_name_freeform);
-  }
-  else {
-    $name = trim($author_firstname);
-    $name = trim($name . ' ' . $author_midname);
-    $name = trim($name . ' ' . $author_lastname);
-    return $name;
-  }
-}
 
 /**
  * Finds biggest node id and increments 1.
@@ -538,4 +523,23 @@ function _tsitaatcom_migrate_set_translations($node, $row) {
 
   $node->field_q_language_auto[LANGUAGE_NONE][0]['value'] = serialize($translations);
   field_attach_update('node', $node);
+}
+
+/**
+ * Clean up empty rows so they don't end up in the database.
+ * @param  object $node Node object
+ * @return void
+ */
+function _tsitaatcom_row_cleanup(&$node) {
+  /*
+  foreach($node as $key => &$line) {
+    if (strpos($key, 'field_') === 0 && is_array($line) && count($line)) {
+      foreach($line as &$langs) {
+        if (count($langs) && empty($langs[0]['value'])) {
+          unset($langs[0]);
+        }
+      }
+    }
+  }
+  */
 }
