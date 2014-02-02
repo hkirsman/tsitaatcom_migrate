@@ -402,20 +402,22 @@ function _tsitaatcom_migrate_attach_author_portrait($node) {
     }
 
     $nid_author_portrait = _tsitaatcom_migrate_get_nid_by_node_title($nice_name);
-    if($nid_author_portrait === FALSE) {
+    if ($nid_author_portrait === FALSE) {
       $nid_author_portrait = _tsitaatcom_migrate_create_node_quote_author_portrait($nice_name, '/var/www/tsitaat/__files/' . $nice_name);
     }
   } else {
     $nid_author_portrait = _tsitaatcom_migrate_get_nid_by_node_title(TSITAATCOM_MIGRATE_ANONYMOUS_IMAGE);
 
-    if($nid_author_portrait === FALSE) {
+    if ($nid_author_portrait === FALSE) {
       $nid_author_portrait = _tsitaatcom_migrate_create_node_quote_author_portrait(TSITAATCOM_MIGRATE_ANONYMOUS_IMAGE, '/var/www/tsitaat/__files/noauthorimg.jpg');
     }
   }
 
-  // Create reference to the new author portrait node.
-  $node->field_qa_portrait_ref[LANGUAGE_NONE][0]['target_id'] = $nid_author_portrait;
-  field_attach_update('node', $node);
+  if ($nid_author_portrait !== FALSE) {
+    // Create reference to the new author portrait node.
+    $node->field_qa_portrait_ref[LANGUAGE_NONE][0]['target_id'] = $nid_author_portrait;
+    field_attach_update('node', $node);
+  }
 }
 
 /**
@@ -423,47 +425,52 @@ function _tsitaatcom_migrate_attach_author_portrait($node) {
  *
  */
 function _tsitaatcom_migrate_create_node_quote_author_portrait($name, $filepath) {
-  $node_quote_author_portrait = new stdClass();
-  $node_quote_author_portrait->title = $name;
-  $node_quote_author_portrait->type = 'quote_author_portrait';
-  node_object_prepare($node_quote_author_portrait); // Sets some defaults. Invokes hook_prepare() and hook_node_prepare().
-  $node_quote_author_portrait->language = LANGUAGE_NONE; // Or e.g. 'en' if locale is enabled
-  $node_quote_author_portrait->uid = TSITAATCOM_MIGRATE_UID_HANNES;
-  $node_quote_author_portrait->status = 1; // (1 or 0): published or not
+  if ($name !== 'noauthorimg.jpg') {
+    $node_quote_author_portrait = new stdClass();
+    $node_quote_author_portrait->title = $name;
+    $node_quote_author_portrait->type = 'quote_author_portrait';
+    node_object_prepare($node_quote_author_portrait); // Sets some defaults. Invokes hook_prepare() and hook_node_prepare().
+    $node_quote_author_portrait->language = LANGUAGE_NONE; // Or e.g. 'en' if locale is enabled
+    $node_quote_author_portrait->uid = TSITAATCOM_MIGRATE_UID_HANNES;
+    $node_quote_author_portrait->status = 1; // (1 or 0): published or not
 
-  // Create managed File object and associate with Image field.
-  $portrait_field_instance = field_info_instance('node', 'field_qap_portrait', 'quote_author_portrait');
-  $file_source = (object) array(
-    'uid' => TSITAATCOM_MIGRATE_UID_HANNES,
-    'uri' => $filepath,
-    'filemime' => file_get_mimetype($filepath),
-    'status' => 1,
-  );
+    // Create managed File object and associate with Image field.
+    $portrait_field_instance = field_info_instance('node', 'field_qap_portrait', 'quote_author_portrait');
+    $file_source = (object) array(
+      'uid' => TSITAATCOM_MIGRATE_UID_HANNES,
+      'uri' => $filepath,
+      'filemime' => file_get_mimetype($filepath),
+      'status' => 1,
+    );
 
-  $directory = 'public://' . $portrait_field_instance['settings']['file_directory'];
+    $directory = 'public://' . $portrait_field_instance['settings']['file_directory'];
 
-  // Create the directory if it doesn't exist.
-  file_prepare_directory($directory, FILE_CREATE_DIRECTORY);
+    // Create the directory if it doesn't exist.
+    file_prepare_directory($directory, FILE_CREATE_DIRECTORY);
 
-  // Copy the file over.
-  $file_target = file_copy($file_source, $directory, FILE_EXISTS_REPLACE);
+    // Copy the file over.
+    $file_target = file_copy($file_source, $directory, FILE_EXISTS_REPLACE);
 
-  $node_quote_author_portrait->field_qap_portrait[LANGUAGE_NONE][0] = (array)$file_target;
+    $node_quote_author_portrait->field_qap_portrait[LANGUAGE_NONE][0] = (array)$file_target;
 
-  node_save($node_quote_author_portrait);
+    node_save($node_quote_author_portrait);
 
-  _tsitaatcom_watchdog_author_portrait($name);
+    _tsitaatcom_watchdog_author_portrait($name);
 
-  return $node_quote_author_portrait->nid;
+    return $node_quote_author_portrait->nid;
 
 
 
-  // Create the directory if it doesn't exist.
-  $directory = PERFECTO_FILE_PATH;
-  file_prepare_directory($directory, FILE_CREATE_DIRECTORY);
+    // Create the directory if it doesn't exist.
+    $directory = PERFECTO_FILE_PATH;
+    file_prepare_directory($directory, FILE_CREATE_DIRECTORY);
 
-  // Copy the file over.
-  $filename = file_unmanaged_copy($file->uri, $directory, FILE_EXISTS_REPLACE);
+    // Copy the file over.
+    $filename = file_unmanaged_copy($file->uri, $directory, FILE_EXISTS_REPLACE);
+  }
+  else {
+    return FALSE;
+  }
 }
 
 /**
